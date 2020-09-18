@@ -153,10 +153,11 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                     }
                 });
 
-        trackingOverlay.setOnClickListener(new View.OnClickListener() {
+        trackingOverlay.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
                 routeToWeb();
+                return true;
             }
         });
 

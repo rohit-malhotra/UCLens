@@ -228,7 +228,7 @@ public class MultiBoxTracker {
       int width = 200;
       int height = 200;
 
-      final String labelString = recognition.title;
+      final String labelString = recognition.title.substring(0, 1).toUpperCase() + recognition.title.substring(1);
 //                  borderedText.drawText(canvas, trackedPos.left + cornerSize, trackedPos.top,
 //       labelString);
       borderedText.drawText(
