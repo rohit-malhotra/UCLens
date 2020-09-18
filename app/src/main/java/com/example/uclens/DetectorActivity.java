@@ -136,7 +136,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         cropToFrameTransform = new Matrix();
         frameToCropTransform.invert(cropToFrameTransform);
 
-        trackingOverlay = (OverlayView) findViewById(R.id.tracking_overlay);
+        trackingOverlay = findViewById(R.id.tracking_overlay);
         trackingOverlay.addCallback(
                 new DrawCallback() {
                     @Override
