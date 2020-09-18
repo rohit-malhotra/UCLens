@@ -33,6 +33,9 @@ import com.example.uclens.env.ImageUtils;
 import com.example.uclens.env.Logger;
 import com.example.uclens.tflite.Classifier.Recognition;
 
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -196,6 +199,11 @@ public class MultiBoxTracker {
       trackedRecognition.location = new RectF(potential.second.getLocation());
       trackedRecognition.title = potential.second.getTitle();
       trackedRecognition.color = COLORS[trackedObjects.size()];
+      if (!Arrays.asList("refrigerator", "tv", "microwave", "oven",
+              "toaster", "laptop").contains(trackedRecognition.title)) {
+        continue;
+      }
+
       trackedObjects.add(trackedRecognition);
 
       if (trackedObjects.size() >= COLORS.length) {
