@@ -16,6 +16,7 @@ limitations under the License.
 package com.example.uclens.tracking;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -25,9 +26,12 @@ import android.graphics.Paint.Join;
 import android.graphics.Paint.Style;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.util.TypedValue;
+import android.view.View;
 
 import com.example.uclens.R;
 import com.example.uclens.env.BorderedText;
@@ -38,32 +42,35 @@ import com.example.uclens.tflite.Classifier.Recognition;
 import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 
 /** A tracker that handles non-max suppression and matches existing objects to new detections. */
 public class MultiBoxTracker {
-  private Drawable icon;
+  private Map<String, IconDetails> titleIconMap;
   private static final float TEXT_SIZE_DIP = 18;
   private static final float MIN_SIZE = 16.0f;
   private static final int[] COLORS = {
-    Color.BLUE,
-    Color.RED,
-    Color.GREEN,
-    Color.YELLOW,
-    Color.CYAN,
-    Color.MAGENTA,
-    Color.WHITE,
-    Color.parseColor("#55FF55"),
-    Color.parseColor("#FFA500"),
-    Color.parseColor("#FF8888"),
-    Color.parseColor("#AAAAFF"),
-    Color.parseColor("#FFFFAA"),
-    Color.parseColor("#55AAAA"),
-    Color.parseColor("#AA33AA"),
-    Color.parseColor("#0D0068")
+    Color.parseColor("#A7B3A1"),
+    Color.parseColor("#F7FFF2"),
+    Color.parseColor("#A1B3B0"),
+    Color.parseColor("#E6FFFB"),
+    Color.parseColor("#A7B3A1"),
+    Color.parseColor("#F7FFF2"),
+    Color.parseColor("#A1B3B0"),
+    Color.parseColor("#E6FFFB"),
+    Color.parseColor("#A7B3A1"),
+    Color.parseColor("#F7FFF2"),
+    Color.parseColor("#A1B3B0"),
+    Color.parseColor("#E6FFFB"),
+    Color.parseColor("#A7B3A1"),
+    Color.parseColor("#F7FFF2"),
+    Color.parseColor("#A1B3B0"),
+    Color.parseColor("#E6FFFB")
   };
   final List<Pair<Float, RectF>> screenRects = new LinkedList<Pair<Float, RectF>>();
   private final Logger logger = new Logger();
@@ -77,6 +84,19 @@ public class MultiBoxTracker {
   private int frameHeight;
   private int sensorOrientation;
 
+  private View.OnClickListener iconClickListener = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      routeToWeb(view.getContext(),(String) view.getTag());
+    }
+  };
+
+  private void routeToWeb(Context context, String webUrl) {
+    Intent i = new Intent(Intent.ACTION_VIEW);
+    i.setData(Uri.parse(webUrl));
+    context.startActivity(i);
+  }
+
   public MultiBoxTracker(final Context context) {
     for (final int color : COLORS) {
       availableColors.add(color);
@@ -84,7 +104,7 @@ public class MultiBoxTracker {
 
     boxPaint.setColor(Color.RED);
     boxPaint.setStyle(Style.STROKE);
-    boxPaint.setStrokeWidth(10.0f);
+    boxPaint.setStrokeWidth(5.0f);
     boxPaint.setStrokeCap(Cap.ROUND);
     boxPaint.setStrokeJoin(Join.ROUND);
     boxPaint.setStrokeMiter(100);
@@ -93,7 +113,48 @@ public class MultiBoxTracker {
         TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP, TEXT_SIZE_DIP, context.getResources().getDisplayMetrics());
     borderedText = new BorderedText(textSizePx);
-    icon = context.getResources().getDrawable(R.drawable.get_services);
+
+    titleIconMap = new HashMap<String, IconDetails>() {{
+      put("refrigerator", new IconDetails(
+        context.getResources().getDrawable(R.drawable.appliance_repair),
+        "Not cooling?",
+        "https://www.urbancompany.com/delhi-ncr-refrigerator-repair"
+      ));
+      put("tv", new IconDetails(
+        context.getResources().getDrawable(R.drawable.appliance_repair),
+        "No Netflix?",
+        "https://www.urbancompany.com/delhi-ncr-tv-repair"
+      ));
+      put("microwave", new IconDetails(
+        context.getResources().getDrawable(R.drawable.appliance_repair),
+        "Cold food?",
+        "https://www.urbancompany.com/delhi-ncr-microwave-repair"
+      ));
+      put("oven", new IconDetails(
+        context.getResources().getDrawable(R.drawable.appliance_repair),
+        "Brownie points?",
+        "https://www.urbancompany.com/delhi-ncr-microwave-repair"
+      ));
+      put("dining table", new IconDetails(
+        context.getResources().getDrawable(R.drawable.carpenter),
+        "Needs polish?",
+        "https://www.urbancompany.com/delhi-ncr-carpenters"
+      ));
+      put("chair", new IconDetails(
+        context.getResources().getDrawable(R.drawable.carpenter),
+        "Need carpenter?",
+        "https://www.urbancompany.com/delhi-ncr-carpenters"
+      ));
+      put("sink", new IconDetails(
+        context.getResources().getDrawable(R.drawable.cleaning),
+        "Needs cleaning?",
+        "https://www.flaticon.com/packs/electronics-106?word=electronics"
+      ));
+    }};
+
+    for (IconDetails iconObj : titleIconMap.values()){
+
+    }
   }
 
   public synchronized void setFrameConfiguration(
@@ -147,29 +208,33 @@ public class MultiBoxTracker {
     for (final TrackedRecognition recognition : trackedObjects) {
       final RectF trackedPos = new RectF(recognition.location);
 
-//      getFrameToCanvasMatrix().mapRect(trackedPos);
-//      boxPaint.setColor(recognition.color);
-//
-//      float cornerSize = Math.min(trackedPos.width(), trackedPos.height()) / 8.0f;
-//      canvas.drawRoundRect(trackedPos, cornerSize, cornerSize, boxPaint);
+      getFrameToCanvasMatrix().mapRect(trackedPos);
+      boxPaint.setColor(recognition.color);
+
+      float cornerSize = Math.min(trackedPos.width(), trackedPos.height()) / 8.0f;
+      canvas.drawRoundRect(trackedPos, cornerSize, cornerSize, boxPaint);
 
       int centerX = (int) (trackedPos.left + trackedPos.right) / 2;
       int centerY = (int) (trackedPos.top + trackedPos.bottom) / 2;
       int width = 200;
       int height = 200;
 
-      icon.setBounds(centerX - width/2, centerY - height/2,
-              centerX + width/2, centerY + height/2);
-      icon.draw(canvas);
+      IconDetails iconObject = titleIconMap.get(recognition.title);
+      int iconLeft = centerX - width/2;
+      int iconTop = centerY - height/2;
+      int iconRight = centerX + width/2;
+      int iconBottom = centerY + height/2;
+      iconObject.icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
+      iconObject.icon.draw(canvas);
+      borderedText.drawText(canvas, iconLeft, iconBottom, iconObject.text, boxPaint);
 
-      final String labelString =
-          !TextUtils.isEmpty(recognition.title)
-              ? String.format("%s %.2f", recognition.title, (100 * recognition.detectionConfidence))
-              : String.format("%.2f", (100 * recognition.detectionConfidence));
-      //            borderedText.drawText(canvas, trackedPos.left + cornerSize, trackedPos.top,
-      // labelString);
-//      borderedText.drawText(
-//          canvas, trackedPos.left + cornerSize, trackedPos.top, labelString + "%", boxPaint);
+
+      final String labelString = recognition.title;
+
+//                  borderedText.drawText(canvas, trackedPos.left + cornerSize, trackedPos.top,
+//       labelString);
+      borderedText.drawText(
+          canvas, trackedPos.left + cornerSize, trackedPos.top, labelString, boxPaint);
     }
   }
 
@@ -214,7 +279,7 @@ public class MultiBoxTracker {
       trackedRecognition.title = potential.second.getTitle();
       trackedRecognition.color = COLORS[trackedObjects.size()];
       if (!Arrays.asList("refrigerator", "tv", "microwave", "oven",
-              "toaster", "laptop").contains(trackedRecognition.title)) {
+        "dining table", "chair", "sink").contains(trackedRecognition.title)) {
         continue;
       }
 
@@ -231,5 +296,17 @@ public class MultiBoxTracker {
     float detectionConfidence;
     int color;
     String title;
+  }
+}
+
+class IconDetails {
+  Drawable icon;
+  String text;
+  String webUrl;
+
+  public IconDetails(Drawable icon, String text, String webUrl) {
+    this.icon = icon;
+    this.text = text;
+    this.webUrl = webUrl;
   }
 }

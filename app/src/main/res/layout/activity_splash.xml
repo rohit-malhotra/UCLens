@@ -14,6 +14,24 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            android:src="@drawable/uc_logo"
+            android:layout_marginHorizontal="30dp"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/uc_logo"
+            />
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="200dp"
+            android:src="@drawable/ic_camera"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/image_camera"
+            android:layout_below="@id/uc_logo"
+            />
         <TextView
             android:id="@+id/fullscreen_content"
             android:layout_width="wrap_content"
@@ -22,19 +40,10 @@
             android:keepScreenOn="true"
             android:text="@string/splash_screen_text"
             android:textColor="#FFFFFF"
-            android:textSize="60sp"
+            android:textSize="30sp"
             android:textStyle="bold"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="100dp"/>
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginTop="100dp"
-            android:src="@drawable/ic_camera"
-            android:layout_below="@id/fullscreen_content"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/image_camera"
-            />
+            android:layout_below="@id/image_camera"/>
     </RelativeLayout>
 
 </RelativeLayout>
