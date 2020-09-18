@@ -32,8 +32,10 @@ import android.text.TextUtils;
 import android.util.Pair;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.example.uclens.R;
+import com.example.uclens.customview.OverlayView;
 import com.example.uclens.env.BorderedText;
 import com.example.uclens.env.ImageUtils;
 import com.example.uclens.env.Logger;
@@ -116,45 +118,52 @@ public class MultiBoxTracker {
 
     titleIconMap = new HashMap<String, IconDetails>() {{
       put("refrigerator", new IconDetails(
+        context,
         context.getResources().getDrawable(R.drawable.appliance_repair),
         "Not cooling?",
         "https://www.urbancompany.com/delhi-ncr-refrigerator-repair"
       ));
       put("tv", new IconDetails(
+        context,
         context.getResources().getDrawable(R.drawable.appliance_repair),
         "No Netflix?",
         "https://www.urbancompany.com/delhi-ncr-tv-repair"
       ));
       put("microwave", new IconDetails(
+        context,
         context.getResources().getDrawable(R.drawable.appliance_repair),
         "Cold food?",
         "https://www.urbancompany.com/delhi-ncr-microwave-repair"
       ));
       put("oven", new IconDetails(
+        context,
         context.getResources().getDrawable(R.drawable.appliance_repair),
         "Brownie points?",
         "https://www.urbancompany.com/delhi-ncr-microwave-repair"
       ));
       put("dining table", new IconDetails(
+        context,
         context.getResources().getDrawable(R.drawable.carpenter),
         "Needs polish?",
         "https://www.urbancompany.com/delhi-ncr-carpenters"
       ));
       put("chair", new IconDetails(
+        context,
         context.getResources().getDrawable(R.drawable.carpenter),
         "Need carpenter?",
         "https://www.urbancompany.com/delhi-ncr-carpenters"
       ));
       put("sink", new IconDetails(
+        context,
         context.getResources().getDrawable(R.drawable.cleaning),
         "Needs cleaning?",
         "https://www.flaticon.com/packs/electronics-106?word=electronics"
       ));
     }};
 
-    for (IconDetails iconObj : titleIconMap.values()){
-
-    }
+//    for (IconDetails iconObj : titleIconMap.values()) {
+//      iconObj.imageView.setOnClickListener(iconClickListener);
+//    }
   }
 
   public synchronized void setFrameConfiguration(
@@ -219,22 +228,24 @@ public class MultiBoxTracker {
       int width = 200;
       int height = 200;
 
+      final String labelString = recognition.title;
+//                  borderedText.drawText(canvas, trackedPos.left + cornerSize, trackedPos.top,
+//       labelString);
+      borderedText.drawText(
+        canvas, trackedPos.left + cornerSize, trackedPos.top, labelString, boxPaint);
+
       IconDetails iconObject = titleIconMap.get(recognition.title);
       int iconLeft = centerX - width/2;
       int iconTop = centerY - height/2;
       int iconRight = centerX + width/2;
       int iconBottom = centerY + height/2;
       iconObject.icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
-      iconObject.icon.draw(canvas);
       borderedText.drawText(canvas, iconLeft, iconBottom, iconObject.text, boxPaint);
-
-
-      final String labelString = recognition.title;
-
-//                  borderedText.drawText(canvas, trackedPos.left + cornerSize, trackedPos.top,
-//       labelString);
-      borderedText.drawText(
-          canvas, trackedPos.left + cornerSize, trackedPos.top, labelString, boxPaint);
+      iconObject.imageView.draw(canvas);
+      OverlayView.webUrl = iconObject.webUrl;
+//      iconObject.imageView.bringToFront();
+//      iconObject.imageView.setClickable(true);
+//      iconObject.imageView.setOnClickListener(iconClickListener);
     }
   }
 
@@ -303,10 +314,15 @@ class IconDetails {
   Drawable icon;
   String text;
   String webUrl;
+  ImageView imageView;
 
-  public IconDetails(Drawable icon, String text, String webUrl) {
+  public IconDetails(Context context, Drawable icon, String text, String webUrl) {
     this.icon = icon;
     this.text = text;
     this.webUrl = webUrl;
+
+    this.imageView = new ImageView(context);
+    this.imageView.setImageDrawable(this.icon);
+    this.imageView.setTag(this.webUrl);
   }
 }

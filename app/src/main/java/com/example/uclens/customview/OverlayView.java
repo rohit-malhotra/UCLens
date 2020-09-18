@@ -26,6 +26,7 @@ import java.util.List;
 /** A simple View providing a render callback to other classes. */
 public class OverlayView extends View {
   private final List<DrawCallback> callbacks = new LinkedList<DrawCallback>();
+  public static String webUrl = "https://www.urbancompany.com";
 
   public OverlayView(final Context context, final AttributeSet attrs) {
     super(context, attrs);

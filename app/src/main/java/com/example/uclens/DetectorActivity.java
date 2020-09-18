@@ -18,6 +18,8 @@ package com.example.uclens;
 
  */
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
@@ -28,10 +30,12 @@ import android.graphics.Paint.Style;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.media.ImageReader.OnImageAvailableListener;
+import android.net.Uri;
 import android.os.SystemClock;
 import android.util.Log;
 import android.util.Size;
 import android.util.TypedValue;
+import android.view.View;
 import android.widget.Toast;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -149,7 +153,20 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                     }
                 });
 
+        trackingOverlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                routeToWeb();
+            }
+        });
+
         tracker.setFrameConfiguration(previewWidth, previewHeight, sensorOrientation);
+    }
+
+    private void routeToWeb() {
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(OverlayView.webUrl));
+        startActivity(i);
     }
 
     @Override
