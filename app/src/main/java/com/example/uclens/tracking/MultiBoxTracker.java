@@ -24,10 +24,12 @@ import android.graphics.Paint.Cap;
 import android.graphics.Paint.Join;
 import android.graphics.Paint.Style;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.util.TypedValue;
 
+import com.example.uclens.R;
 import com.example.uclens.env.BorderedText;
 import com.example.uclens.env.ImageUtils;
 import com.example.uclens.env.Logger;
@@ -40,8 +42,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+
 /** A tracker that handles non-max suppression and matches existing objects to new detections. */
 public class MultiBoxTracker {
+  private Drawable icon;
   private static final float TEXT_SIZE_DIP = 18;
   private static final float MIN_SIZE = 16.0f;
   private static final int[] COLORS = {
@@ -89,6 +93,7 @@ public class MultiBoxTracker {
         TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP, TEXT_SIZE_DIP, context.getResources().getDisplayMetrics());
     borderedText = new BorderedText(textSizePx);
+    icon = context.getResources().getDrawable(R.drawable.get_services);
   }
 
   public synchronized void setFrameConfiguration(
@@ -142,11 +147,20 @@ public class MultiBoxTracker {
     for (final TrackedRecognition recognition : trackedObjects) {
       final RectF trackedPos = new RectF(recognition.location);
 
-      getFrameToCanvasMatrix().mapRect(trackedPos);
-      boxPaint.setColor(recognition.color);
+//      getFrameToCanvasMatrix().mapRect(trackedPos);
+//      boxPaint.setColor(recognition.color);
+//
+//      float cornerSize = Math.min(trackedPos.width(), trackedPos.height()) / 8.0f;
+//      canvas.drawRoundRect(trackedPos, cornerSize, cornerSize, boxPaint);
 
-      float cornerSize = Math.min(trackedPos.width(), trackedPos.height()) / 8.0f;
-      canvas.drawRoundRect(trackedPos, cornerSize, cornerSize, boxPaint);
+      int centerX = (int) (trackedPos.left + trackedPos.right) / 2;
+      int centerY = (int) (trackedPos.top + trackedPos.bottom) / 2;
+      int width = 200;
+      int height = 200;
+
+      icon.setBounds(centerX - width/2, centerY - height/2,
+              centerX + width/2, centerY + height/2);
+      icon.draw(canvas);
 
       final String labelString =
           !TextUtils.isEmpty(recognition.title)
@@ -154,8 +168,8 @@ public class MultiBoxTracker {
               : String.format("%.2f", (100 * recognition.detectionConfidence));
       //            borderedText.drawText(canvas, trackedPos.left + cornerSize, trackedPos.top,
       // labelString);
-      borderedText.drawText(
-          canvas, trackedPos.left + cornerSize, trackedPos.top, labelString + "%", boxPaint);
+//      borderedText.drawText(
+//          canvas, trackedPos.left + cornerSize, trackedPos.top, labelString + "%", boxPaint);
     }
   }
 
